@@ -1,0 +1,353 @@
+#include <kipr/botball.h>
+//Created by Jame
+//functions
+void moveforarm(int position);//start arm= 1403
+void clawleftmove(int position);
+void faceObject();//squares up
+void clawRightmove(int position);
+void lookforyellow();//looking for yellow channel 0
+void driveForward(int speed,int msecs);
+void driveBackward(int speed, int msecs);
+void driveLeft(int speed, int msecs);
+void driveRight(int speed, int msecs);
+void codeone();//burning on right
+void twistermove(int position);
+void slowforarm(int servo,int destination);
+void pause(int msecs);
+void lookforyellowbuilding();
+void codeleft();
+void faceYellow();
+void codeCenter();
+void codeRight();
+void codetwo();
+//variables
+int clawright=3;
+int clawleft=2;
+int forarm= 0;
+int twister=1;
+int startfor=1403;
+int clawstartright=1907;
+int clawstartleft=158;
+int starttwister=2019;
+int i;
+//get_create_lclif();
+int main()
+{
+    //wait_for_light(0);
+    shut_down_in(120);
+    create_connect();
+    enable_servos();
+    moveforarm(startfor);// forarm goes up
+    slowforarm(0,261);
+    
+
+    disable_servos();
+    create_disconnect();
+    return 0;
+}
+void moveforarm(int position)
+{
+    set_servo_position(forarm,position);
+    wait_for_milliseconds(1000);
+}
+void clawleftmove(int position)
+{
+    set_servo_position(clawleft,position);
+    wait_for_milliseconds(100);
+}
+void clawRightmove(int position)
+{
+    set_servo_position(clawright,position);
+    wait_for_milliseconds(100);
+}
+void twistermove(int position)
+{
+    set_servo_position(twister,position);
+    wait_for_milliseconds(100);
+}
+void lookforyellow()
+{
+
+    camera_open();
+    camera_update();
+    for(i = 0; i < 50; i++)
+    {
+        printf("%i\n", get_object_center_x(0, 0));
+        camera_update();
+ 
+    }
+    if(get_object_center_x(0, 0) < 80)
+    {
+        puts("On left");
+        printf("%i\n", get_object_center_x(0, 0));
+        codetwo();
+    }
+    else if(get_object_center_x(0, 0) > 80)
+    {
+        puts("On Right");
+        printf("%i\n", get_object_center_x(0, 0));
+        codeone();
+    }
+    else
+    {
+        puts("Object in center");
+    }
+    camera_close();
+}
+void driveForward(int speed,int msecs)//drive forward
+{
+    create_drive_direct(speed,speed);//drives
+    wait_for_milliseconds(msecs);//drive for this long
+    create_drive_direct(0, 0);//drives
+    wait_for_milliseconds(10);
+}
+void driveBackward(int speed, int msecs)
+{
+    create_drive_direct(-speed,-speed);//drives
+    wait_for_milliseconds(msecs);//drive for this long
+    create_drive_direct(0, 0);//drives
+    wait_for_milliseconds(10);
+}
+void driveLeft(int speed, int msecs)
+{
+    create_drive_direct(-speed,speed);//drives
+    wait_for_milliseconds(msecs);//drive for this long
+    create_drive_direct(0, 0);//drives
+    wait_for_milliseconds(10);
+}
+void driveRight(int speed, int msecs)
+{
+    create_drive_direct(speed,-speed);//drives
+    wait_for_milliseconds(msecs);//drive for this long
+    create_drive_direct(0, 0);//drives
+    wait_for_milliseconds(10);
+}
+void codeone()
+{
+    driveLeft(200,100);
+   
+    clawRightmove(clawstartright);
+    slowforarm(0,1516);
+    pause(1000);
+    driveLeft(100,50);
+    driveForward(100,50);
+    driveRight(100,300);
+    slowforarm(0,1600);
+    clawleftmove(284);
+    clawRightmove(553);
+    pause(1000);
+    slowforarm(0,261);
+    driveRight(100,800);
+    driveBackward(100,5200);
+    driveLeft(100,2600);
+    pause(5000);
+    lookforyellowbuilding();
+}
+void faceObject()
+{
+    puts("faceObject");
+    camera_open();
+    camera_update();
+
+    while (get_object_center_x(1, 0) < 60|| get_object_center_x(1, 0) > 100)
+    {
+        if(get_object_center_x(1, 0) < 60)
+        {
+            puts("On left");
+            printf("%i\n", get_object_center_x(1, 0));
+            msleep(500);
+            create_drive_direct(-20,20);//drives
+        }
+        else if(get_object_center_x(1, 0) > 100)
+        {
+            puts("On Right");
+            printf("%i\n", get_object_center_x(1, 0));
+            create_drive_direct(20,-20);
+        }
+        else
+        {
+            puts("Object in center");
+        }
+        camera_update();
+    }
+    camera_close();
+}
+void slowforarm(servo,destination)
+{
+    if(destination > get_servo_position(servo))
+    {
+
+        for(i = get_servo_position(servo); i < destination; i= i + 5)
+        {
+            set_servo_position(servo, i);
+            msleep(10);
+        }
+    }
+    else if (destination < get_servo_position(servo))
+    {
+        for (i= get_servo_position(servo); i > destination; i= i-5)
+        {
+            set_servo_position(servo, i);
+            msleep(10);
+        }
+    }
+}
+void pause(int msecs)
+{
+    motor(0,0);
+    msleep(msecs);
+}
+void lookforyellowbuilding()
+{
+    puts("looking for yellow building");
+    camera_open();
+    camera_update();
+    for(i = 0; i < 60; i++)
+    {
+        printf("%i\n", get_object_center_x(1, 0));
+        camera_update();
+    }
+    if(get_object_center_x(1, 0) < 80)
+    {
+        puts("On left");
+        printf("%i\n", get_object_center_x(1, 0));
+        codeleft();
+        //building on left
+    }
+    else if(get_object_center_x(1, 0) > 80)
+    {
+        puts("On center");
+        printf("%i\n", get_object_center_x(1, 0));
+        codeCenter();
+    }
+    else if(get_object_center_x(1, 0) == 0)
+    {
+        puts("Object in Right");
+        codeRight();
+        //building in the middle
+    }
+    camera_close();
+}
+void codeleft()
+{
+    driveLeft(100,800);
+    driveBackward(200,2500);
+    driveRight(200,850);
+    driveBackward(200,3100);
+    driveRight(200,1800);
+    slowforarm(1,248);//not for arm its the twister
+    slowforarm(0,691);
+    clawleftmove(clawstartleft);
+    clawRightmove(clawstartright);
+    pause(1000);
+    driveBackward(200,1000);
+    slowforarm(0,291);
+    driveLeft(200,800);
+    driveBackward(300,2200);
+    driveRight(200,800);
+    driveForward(300,800);
+    slowforarm(1,248);//not for arm its the twister
+    slowforarm(0,691);
+    pause(1000);
+    clawleftmove(561);
+    clawRightmove(359);
+    pause(2000);
+    slowforarm(0,291);
+    driveBackward(100,3000);
+    driveLeft(100,2400);
+    slowforarm(0,1300);
+    clawleftmove(clawstartleft);
+    clawRightmove(clawstartright);
+    slowforarm(0,260);
+    driveRight(200,1100);
+
+    driveForward(100,1200);
+    clawleftmove(461);
+    clawRightmove(659);
+}
+void faceYellow()
+{
+    puts("faceObject");
+    camera_open();
+    camera_update();
+
+    while (get_object_center_x(0, 0) < 70|| get_object_center_x(1, 0) > 80)
+    {
+        if(get_object_center_x(0, 0) < 80)
+        {
+            puts("On left");
+            printf("%i\n", get_object_center_x(1, 0));
+            msleep(500);
+            create_drive_direct(-20,20);//drives
+        }
+        else if(get_object_center_x(0, 0) > 80)
+        {
+            puts("On right");
+            printf("%i\n", get_object_center_x(1, 0));
+            create_drive_direct(20,-20);
+        }
+        else
+        {
+            puts("Object on center");
+        }
+        camera_update();
+    }
+    camera_close();
+}
+void codeCenter()
+{
+    driveRight(100,1100);
+    driveBackward(200,3400);
+    driveRight(200,2000);
+    twistermove(1204);
+    slowforarm(0,438);
+    driveForward(100,1000);
+    twistermove(406);
+    pause(1000);
+    clawleftmove(clawstartleft);
+    clawRightmove(clawstartright);
+    pause(1000);
+    twistermove(1204);
+    driveBackward(100,3000);
+    driveRight(100,2000);
+    driveForward(100,3400);
+    driveLeft(100,2000);
+    driveForward(100,2500);
+    clawleftmove(clawstartleft);
+    clawRightmove(clawstartright);
+    slowforarm(1,248);//not for arm its the twister
+    slowforarm(0,591);
+    clawleftmove(261);
+    clawRightmove(359);
+    slowforarm(0,256);
+}
+void codeRight()
+{
+    
+}
+void codetwo()
+{
+    slowforarm(0,1814);
+    slowforarm(0,220);
+    driveRight(100,3400);
+    driveForward(100,3650);
+    driveLeft(100,900);
+    twistermove(0);
+    clawleftmove(clawstartleft);
+    clawRightmove(clawstartright);
+    slowforarm(0,1516);
+    pause(1000);
+    driveLeft(100,50);
+    driveForward(100,50);
+    driveRight(100,300);
+    slowforarm(0,1600);
+    clawleftmove(284);
+    clawRightmove(553);
+    pause(1000);
+    slowforarm(0,261);
+    driveRight(100,700);
+    driveBackward(100,5200);
+    driveLeft(100,2600);
+    pause(5000);
+    lookforyellowbuilding();
+}
